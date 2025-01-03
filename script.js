@@ -2,20 +2,19 @@
 const canvas = document.getElementById("whiteboard");
 const ctx = canvas.getContext("2d");
 
-
 // Canvas setup
 function resizeCanvas() {
-    // Save the current canvas content
-    const savedContent = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  
-    // Resize the canvas
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = canvas.parentElement.offsetHeight;
-  
-    // Restore the saved content
-    ctx.putImageData(savedContent, 0, 0);
-  }
-resizeCanvas();  
+  // Save the current canvas content
+  const savedContent = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  // Resize the canvas
+  canvas.width = canvas.parentElement.offsetWidth;
+  canvas.height = canvas.parentElement.offsetHeight;
+
+  // Restore the saved content
+  ctx.putImageData(savedContent, 0, 0);
+}
+resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 // Variables for drawing
@@ -49,17 +48,14 @@ document.getElementById("fullscreen").addEventListener("click", () => {
 // Side menu tools
 document.getElementById("pen-tool").addEventListener("click", () => {
   currentTool = "pen";
-  canvas.className = "pen";
 });
 
 document.getElementById("eraser-tool").addEventListener("click", () => {
   currentTool = "eraser";
-  canvas.className = "eraser";
 });
 
 document.getElementById("select-tool").addEventListener("click", () => {
   currentTool = "select";
-  canvas.className = "select";
 });
 
 document.getElementById("draw-line").addEventListener("click", () => {
@@ -72,6 +68,10 @@ document.getElementById("draw-rect").addEventListener("click", () => {
 
 document.getElementById("draw-circle").addEventListener("click", () => {
   currentTool = "circle";
+});
+
+document.getElementById("text-tool").addEventListener("click", () => {
+  currentTool = "text";
 });
 
 // Drawing functions
@@ -132,6 +132,13 @@ canvas.addEventListener("mouseup", (e) => {
     ctx.beginPath();
     ctx.arc(startX, startY, radius, 0, Math.PI * 2);
     ctx.stroke();
+  } else if (currentTool === "text") {
+    const text = prompt("Enter the text:");
+    if (text) {
+      ctx.fillStyle = brushColor;
+      ctx.font = `${brushSize * 2}px Arial`;
+      ctx.fillText(text, startX, startY);
+    }
   }
 });
 
