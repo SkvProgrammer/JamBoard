@@ -2,24 +2,26 @@
 const canvas = document.getElementById("whiteboard");
 const ctx = canvas.getContext("2d");
 
-// Set canvas to fill available space dynamically
+// Canvas setup
 function resizeCanvas() {
-  canvas.width = canvas.parentElement.offsetWidth;
-  canvas.height = canvas.parentElement.offsetHeight;
-}
-resizeCanvas();
+    // Save the current canvas content
+    const savedContent = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  
+    // Resize the canvas
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+  
+    // Restore the saved content
+    ctx.putImageData(savedContent, 0, 0);
+  }
+resizeCanvas();  
 window.addEventListener("resize", resizeCanvas);
 
 // Variables for drawing
 let isDrawing = false;
 let brushColor = "#000000";
 let brushSize = 10;
-
-// Event listeners for drawing
-canvas.addEventListener("mousedown", startDrawing);
-canvas.addEventListener("mousemove", draw);
-canvas.addEventListener("mouseup", stopDrawing);
-canvas.addEventListener("mouseout", stopDrawing);
+let currentTool = "pen"; // Tracks the active tool (pen, eraser, shapes)
 
 // Event listeners for controls
 document.getElementById("color").addEventListener("input", (e) => {
@@ -43,35 +45,100 @@ document.getElementById("fullscreen").addEventListener("click", () => {
   document.documentElement.requestFullscreen();
 });
 
-// Drawing functions
-function startDrawing(e) {
-  isDrawing = true;
-  ctx.beginPath();
-  ctx.moveTo(e.offsetX, e.offsetY);
-}
+// Side menu tools
+document.getElementById("pen-tool").addEventListener("click", () => {
+  currentTool = "pen";
+  canvas.className = "pen";
+});
 
-function draw(e) {
+document.getElementById("eraser-tool").addEventListener("click", () => {
+  currentTool = "eraser";
+  canvas.className = "eraser";
+});
+
+document.getElementById("select-tool").addEventListener("click", () => {
+  currentTool = "select";
+  canvas.className = "select";
+});
+
+document.getElementById("draw-line").addEventListener("click", () => {
+  currentTool = "line";
+});
+
+document.getElementById("draw-rect").addEventListener("click", () => {
+  currentTool = "rectangle";
+});
+
+document.getElementById("draw-circle").addEventListener("click", () => {
+  currentTool = "circle";
+});
+
+// Drawing functions
+let startX, startY;
+
+canvas.addEventListener("mousedown", (e) => {
+  isDrawing = true;
+  startX = e.offsetX;
+  startY = e.offsetY;
+
+  if (currentTool === "pen" || currentTool === "eraser") {
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+  }
+});
+
+canvas.addEventListener("mousemove", (e) => {
   if (!isDrawing) return;
 
-  ctx.lineWidth = brushSize;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = brushColor;
+  if (currentTool === "pen") {
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = brushColor;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+  } else if (currentTool === "eraser") {
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#ffffff"; // Eraser color
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+  }
+});
 
-  ctx.lineTo(e.offsetX, e.offsetY);
-  ctx.stroke();
-}
-
-function stopDrawing() {
+canvas.addEventListener("mouseup", (e) => {
+  if (!isDrawing) return;
   isDrawing = false;
-  ctx.closePath();
-}
 
-// Clear the canvas
+  if (currentTool === "line") {
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = brushColor;
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+  } else if (currentTool === "rectangle") {
+    const rectWidth = e.offsetX - startX;
+    const rectHeight = e.offsetY - startY;
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = brushColor;
+    ctx.strokeRect(startX, startY, rectWidth, rectHeight);
+  } else if (currentTool === "circle") {
+    const radius = Math.sqrt(
+      Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
+    );
+    ctx.lineWidth = brushSize;
+    ctx.strokeStyle = brushColor;
+    ctx.beginPath();
+    ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+});
+
+// Utility functions
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-// Save the canvas as an image
 function saveImage() {
   const link = document.createElement("a");
   link.download = "whiteboard.png";
@@ -79,7 +146,6 @@ function saveImage() {
   link.click();
 }
 
-// Upload an image to the canvas
 function uploadImage(e) {
   const file = e.target.files[0];
   if (!file) return;
