@@ -13,6 +13,16 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Additional CSS for selected tool effect */
+      .selected {
+        background-color: #dbe9ff;
+      }
+
+      .btn {
+        transition: background-color 0.3s ease;
+      }
+    </style>
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -48,24 +58,31 @@
     <div class="container-fluid vh-100 d-flex flex-row">
       <!-- Side Menu -->
       <div id="side-menu" class="bg-light p-3 h-100">
-        <button id="select-tool" class="btn btn-light w-100 mb-3" title="Select">
-          <i class="fas fa-mouse-pointer"></i>
-        </button>
-        <button id="pen-tool" class="btn btn-light w-100 mb-3" title="Pen">
-          <i class="fas fa-pen"></i>
-        </button>
-        <button id="eraser-tool" class="btn btn-light w-100 mb-3" title="Eraser">
-          <i class="fas fa-eraser"></i>
-        </button>
-        <button id="draw-line" class="btn btn-light w-100 mb-3" title="Draw Line">
-          <i class="fas fa-minus"></i>
-        </button>
-        <button id="draw-rect" class="btn btn-light w-100 mb-3" title="Draw Rectangle">
-          <i class="far fa-square"></i>
-        </button>
-        <button id="draw-circle" class="btn btn-light w-100 mb-3" title="Draw Circle">
-          <i class="far fa-circle"></i>
-        </button>
+        <!-- Tools Menu -->
+        <div class="mb-3">
+          <button id="select-tool" class="btn btn-light w-100 mb-3" title="Select">
+            <i class="fas fa-mouse-pointer"></i>
+          </button>
+          <button id="pen-tool" class="btn btn-light w-100 mb-3" title="Pen">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button id="eraser-tool" class="btn btn-light w-100 mb-3" title="Eraser">
+            <i class="fas fa-eraser"></i>
+          </button>
+        </div>
+
+        <!-- Shapes Menu -->
+        <div class="mb-3">
+          <button id="draw-line" class="btn btn-light w-100 mb-3" title="Draw Line">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button id="draw-rect" class="btn btn-light w-100 mb-3" title="Draw Rectangle">
+            <i class="far fa-square"></i>
+          </button>
+          <button id="draw-circle" class="btn btn-light w-100 mb-3" title="Draw Circle">
+            <i class="far fa-circle"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Content Area -->
@@ -114,6 +131,20 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // JavaScript to handle tool selection and update background color
+      const tools = document.querySelectorAll('#select-tool, #pen-tool, #eraser-tool, #draw-line, #draw-rect, #draw-circle');
+
+      tools.forEach(tool => {
+        tool.addEventListener('click', () => {
+          // Remove the 'selected' class from all buttons
+          tools.forEach(button => button.classList.remove('selected'));
+          
+          // Add the 'selected' class to the clicked button
+          tool.classList.add('selected');
+        });
+      });
+    </script>
     <script src="script.js"></script>
   </body>
 </html>

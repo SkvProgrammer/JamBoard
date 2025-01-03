@@ -2,6 +2,7 @@
 const canvas = document.getElementById("whiteboard");
 const ctx = canvas.getContext("2d");
 
+
 // Canvas setup
 function resizeCanvas() {
     // Save the current canvas content
