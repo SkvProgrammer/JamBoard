@@ -159,8 +159,8 @@ document.getElementById("eraser-size").addEventListener("input", (e) => {
 // Save Work
 function saveWork() {
   const link = document.createElement("a");
-  link.download = "whiteboard.png";
-  link.href = canvas.toDataURL("image/png");
+  link.download = "whiteboard.jpg";
+  link.href = canvas.toDataURL("image/jpg");
   link.click();
 }
 
@@ -194,6 +194,14 @@ function toggleFullscreen() {
     document.exitFullscreen();
   }
 }
+function deleteEntire() {
+  const canvas = document.getElementById('whiteboard');  // Replace with your canvas ID
+  const ctx = canvas.getContext('2d');
+  
+  // Clear the entire canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 
 // Call resizeCanvas when fullscreen changes
 document.addEventListener('fullscreenchange', resizeCanvas);

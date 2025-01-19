@@ -56,6 +56,9 @@
       <button id="fullscreen-button" aria-label="Toggle Fullscreen" onclick="toggleFullscreen()">
         <i class="fas fa-expand"></i>
       </button>
+      <button id="delete-button" aria-label="delete" onclick="deleteEntire()">
+        <i class="fas fa-trash"></i>
+      </button>
     </aside>
 
     <!-- Main Content -->
@@ -63,15 +66,15 @@
       <!-- Dynamic Tool Options -->
       <section id="tool-options-container" class="p-3 bg-light">
         <div id="pen-options" class="tool-options active">
-          <label for="pen-size">Pen Size:</label>
-          <input type="range" id="pen-size" min="2" max="50" value="10">
-          <label for="pen-color">Pen Color:</label>
+          <label for="pen-size"></label>
+          <input type="number" id="pen-size" min="2" max="50" value="10">
+          <label for="pen-color"></label>
           <input type="color" id="pen-color" value="#000000">
         </div>
 
         <div id="eraser-options" class="tool-options">
-          <label for="eraser-size">Eraser Size:</label>
-          <input type="range" id="eraser-size" min="2" max="50" value="20">
+          <label for="eraser-size">Eraser Size</label>
+          <input type="number" id="eraser-size" min="2" max="50" value="20">
         </div>
 
         <div id="text-options" class="tool-options">
@@ -84,16 +87,16 @@
       <section class="flex-grow-1 d-flex justify-content-center align-items-center">
         <canvas id="whiteboard"></canvas>
       </section>
+      <footer class="mt-auto">
+        <div class="container text-center py-2">
+          <h6>Whiteboard | Made with ❤️ by <a href="https://github.com/skvprogrammer" class="text-light">SKV</a></h6>
+        </div>
+      </footer> 
+    
     </main>
   </div>
 
-  <!-- Footer -->
-  <footer class="mt-auto">
-    <div class="container text-center py-2">
-      <h6>Whiteboard | Made with ❤️ by <a href="https://github.com/skvprogrammer" class="text-light">SKV</a></h6>
-    </div>
-  </footer>
-
+  
   <script src="script.js"></script>
 </body>
 
