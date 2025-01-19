@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,158 +8,93 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-    }
-
-    nav.navbar {
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    #side-menu {
-      background-color: #ffffff;
-      width: 100px;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-      padding: 20px 10px;
-    }
-
-    #side-menu button {
-      display: block;
-      width: 60%;
-      margin: 10px auto;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      background: #f8f9fa;
-      border-radius: 5px;
-      text-align: left;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    #side-menu button:hover {
-      background-color: #e7eaf3;
-    }
-
-    #side-menu button.active {
-      background-color: #0d6efd;
-      color: #fff;
-    }
-
-    .tool-options {
-      display: none;
-      margin: 10px;
-    }
-
-    .tool-options.active {
-      display: block;
-    }
-
-    #whiteboard {
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
-      background: #ffffff;
-      max-width: 100%;
-      max-height: 100%;
-      cursor: crosshair;
-    }
-
-    footer {
-      background-color: #0d6efd;
-      color: white;
-      text-align: center;
-      padding: 10px 0;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      #side-menu {
-        width: 100px;
-      }
-
-      #side-menu button {
-        font-size: 12px;
-        padding: 8px 10px;
-      }
-    }
+    /* Add your CSS from above */
   </style>
 </head>
+
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Whiteboard</a>
     </div>
   </nav>
 
+  <!-- Layout -->
   <div class="d-flex vh-100">
     <!-- Sidebar -->
-    <div id="side-menu">
-      <button id="pointer-tool" class="active" data-tool="pointer" title="Pointer Tool" onclick="setTool('pointer')">
+    <aside id="side-menu">
+      <button id="pointer-tool" class="active" data-tool="pointer" aria-label="Pointer Tool" onclick="setTool('pointer')">
         <i class="fas fa-mouse-pointer"></i>
       </button>
-      <button id="pen-tool" data-tool="pen" title="Pen Tool" onclick="setTool('pen')">
+      <button id="pen-tool" data-tool="pen" aria-label="Pen Tool" onclick="setTool('pen')">
         <i class="fas fa-pen"></i>
       </button>
-      <button id="eraser-tool" data-tool="eraser" title="Eraser Tool" onclick="setTool('eraser')">
+      <button id="eraser-tool" data-tool="eraser" aria-label="Eraser Tool" onclick="setTool('eraser')">
         <i class="fas fa-eraser"></i>
       </button>
-      <button id="text-tool" data-tool="text" title="Add Text" onclick="setTool('text')">
+      <button id="text-tool" data-tool="text" aria-label="Text Tool" onclick="setTool('text')">
         <i class="fas fa-font"></i>
       </button>
-      <button id="line-tool" data-tool="line" title="Draw Line" onclick="setTool('line')">
+      <button id="line-tool" data-tool="line" aria-label="Line Tool" onclick="setTool('line')">
         <i class="fas fa-minus"></i>
       </button>
-      <button id="rectangle-tool" data-tool="rectangle" title="Draw Rectangle" onclick="setTool('rectangle')">
+      <button id="rectangle-tool" data-tool="rectangle" aria-label="Rectangle Tool" onclick="setTool('rectangle')">
         <i class="far fa-square"></i>
       </button>
-      <button id="circle-tool" data-tool="circle" title="Draw Circle" onclick="setTool('circle')">
+      <button id="circle-tool" data-tool="circle" aria-label="Circle Tool" onclick="setTool('circle')">
         <i class="far fa-circle"></i>
       </button>
-      <button id="save-button" title="Save Your Work" onclick="saveWork()">
+      <button id="save-button" aria-label="Save Work" onclick="saveWork()">
         <i class="fas fa-save"></i>
       </button>
-      <button id="upload-button" title="Upload Image" onclick="uploadImage()">
+      <button id="upload-button" aria-label="Upload Image" onclick="uploadImage()">
         <i class="fas fa-upload"></i>
       </button>
-      <button id="fullscreen-button" title="Toggle Fullscreen" onclick="toggleFullscreen()">
+      <button id="fullscreen-button" aria-label="Toggle Fullscreen" onclick="toggleFullscreen()">
         <i class="fas fa-expand"></i>
       </button>
-      
-    </div>
+    </aside>
 
     <!-- Main Content -->
-    <div class="flex-grow-1 d-flex flex-column">
-      <!-- Dynamic Options -->
-      <div id="tool-options-container" class="p-3 bg-light">
+    <main class="flex-grow-1 d-flex flex-column">
+      <!-- Dynamic Tool Options -->
+      <section id="tool-options-container" class="p-3 bg-light">
         <div id="pen-options" class="tool-options active">
-          <label>Pen Size: <input type="range" id="pen-size" min="2" max="50" value="10"></label>
-          <label>Pen Color: <input type="color" id="pen-color" value="#000000"></label>
+          <label for="pen-size">Pen Size:</label>
+          <input type="range" id="pen-size" min="2" max="50" value="10">
+          <label for="pen-color">Pen Color:</label>
+          <input type="color" id="pen-color" value="#000000">
         </div>
 
         <div id="eraser-options" class="tool-options">
-          <label>Eraser Size: <input type="range" id="eraser-size" min="2" max="50" value="20"></label>
+          <label for="eraser-size">Eraser Size:</label>
+          <input type="range" id="eraser-size" min="2" max="50" value="20">
         </div>
 
         <div id="text-options" class="tool-options">
-          <label>Font Size: <input type="number" id="font-size" value="20" min="10" max="100"></label>
+          <label for="font-size">Font Size:</label>
+          <input type="number" id="font-size" value="20" min="10" max="100">
         </div>
-      </div>
+      </section>
 
       <!-- Whiteboard Canvas -->
-      <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+      <section class="flex-grow-1 d-flex justify-content-center align-items-center">
         <canvas id="whiteboard"></canvas>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 
-  <footer>
-    <h6>Whiteboard | Made with ❤️ by <a href="https://github.com/skvprogrammer" style="color:black!important;">SKV</a></h6>
+  <!-- Footer -->
+  <footer class="mt-auto">
+    <div class="container text-center py-2">
+      <h6>Whiteboard | Made with ❤️ by <a href="https://github.com/skvprogrammer" class="text-light">SKV</a></h6>
+    </div>
   </footer>
 
   <script src="script.js"></script>
 </body>
+
 </html>
