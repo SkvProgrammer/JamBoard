@@ -1,170 +1,205 @@
-// Variables for canvas
+// Canvas Setup
 const canvas = document.getElementById("whiteboard");
 const ctx = canvas.getContext("2d");
 
-// Canvas setup
-function resizeCanvas() {
-  // Save the current canvas content
-  const savedContent = ctx.getImageData(0, 0, canvas.width, canvas.height);
+// Set initial canvas size
+resizeCanvas();
 
-  // Resize the canvas
+// Listen for window resize events to adjust canvas size
+window.addEventListener('resize', resizeCanvas);
+
+// Function to resize the canvas
+function resizeCanvas() {
+  // Save current content
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  // Update canvas size to match the container
   canvas.width = canvas.parentElement.offsetWidth;
   canvas.height = canvas.parentElement.offsetHeight;
 
-  // Restore the saved content
-  ctx.putImageData(savedContent, 0, 0);
+  // Restore the content after resizing
+  ctx.putImageData(imageData, 0, 0);
 }
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
 
-// Variables for drawing
+// Tool Variables
 let isDrawing = false;
+let currentTool = "pointer";
+let penSize = 10;
+let eraserSize = 10;
 let brushColor = "#000000";
-let brushSize = 10;
-let currentTool = "pen"; // Tracks the active tool (pen, eraser, shapes)
+let startX = 0, startY = 0;
 
-// Event listeners for controls
-document.getElementById("color").addEventListener("input", (e) => {
-  brushColor = e.target.value;
-});
+// Utility: Get the current brush size based on the tool
+function getBrushSize() {
+  return currentTool === "eraser" ? eraserSize : penSize;
+}
 
-document.getElementById("size").addEventListener("input", (e) => {
-  const value = parseInt(e.target.value, 10);
-  if (value >= 2 && value <= 50) {
-    brushSize = value;
+// Utility: Get event coordinates (mouse or touch)
+function getEventCoordinates(e) {
+  if (e.touches) {
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
   }
-});
+  return { x: e.offsetX, y: e.offsetY };
+}
 
-document.getElementById("clear").addEventListener("click", clearCanvas);
+// Set Active Tool
+function setTool(tool) {
+  currentTool = tool;
 
-document.getElementById("save").addEventListener("click", saveImage);
+  // Highlight active tool
+  document.querySelectorAll("#side-menu button").forEach((btn) => {
+    btn.classList.toggle("active", btn.id === `${tool}-tool`);
+  });
 
-document.getElementById("upload").addEventListener("change", uploadImage);
+  // Show tool options dynamically
+  document.querySelectorAll(".tool-options").forEach((options) => {
+    options.classList.toggle("active", options.id === `${tool}-options`);
+  });
+}
 
-document.getElementById("fullscreen").addEventListener("click", () => {
-  document.documentElement.requestFullscreen();
-});
+// Start Drawing
+function startDrawing(e) {
+  if (currentTool === "pointer") return;
 
-// Side menu tools
-document.getElementById("pen-tool").addEventListener("click", () => {
-  currentTool = "pen";
-});
-
-document.getElementById("eraser-tool").addEventListener("click", () => {
-  currentTool = "eraser";
-});
-
-document.getElementById("select-tool").addEventListener("click", () => {
-  currentTool = "select";
-});
-
-document.getElementById("draw-line").addEventListener("click", () => {
-  currentTool = "line";
-});
-
-document.getElementById("draw-rect").addEventListener("click", () => {
-  currentTool = "rectangle";
-});
-
-document.getElementById("draw-circle").addEventListener("click", () => {
-  currentTool = "circle";
-});
-
-document.getElementById("text-tool").addEventListener("click", () => {
-  currentTool = "text";
-});
-
-// Drawing functions
-let startX, startY;
-
-canvas.addEventListener("mousedown", (e) => {
   isDrawing = true;
-  startX = e.offsetX;
-  startY = e.offsetY;
+  const coords = getEventCoordinates(e);
+  startX = coords.x;
+  startY = coords.y;
 
   if (currentTool === "pen" || currentTool === "eraser") {
     ctx.beginPath();
     ctx.moveTo(startX, startY);
   }
-});
 
-canvas.addEventListener("mousemove", (e) => {
+  e.preventDefault(); // Prevent scrolling on touch devices
+}
+
+// Draw on Canvas
+function draw(e) {
   if (!isDrawing) return;
 
+  const coords = getEventCoordinates(e);
+
+  ctx.lineWidth = getBrushSize();
   if (currentTool === "pen") {
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = "round";
     ctx.strokeStyle = brushColor;
-    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.lineTo(coords.x, coords.y);
     ctx.stroke();
   } else if (currentTool === "eraser") {
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#ffffff"; // Eraser color
-    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineTo(coords.x, coords.y);
     ctx.stroke();
   }
-});
 
-canvas.addEventListener("mouseup", (e) => {
+  e.preventDefault(); // Prevent scrolling on touch devices
+}
+
+// Stop Drawing
+function stopDrawing(e) {
   if (!isDrawing) return;
   isDrawing = false;
 
+  const coords = getEventCoordinates(e);
+
   if (currentTool === "line") {
-    ctx.lineWidth = brushSize;
-    ctx.strokeStyle = brushColor;
     ctx.beginPath();
+    ctx.lineWidth = getBrushSize();
+    ctx.strokeStyle = brushColor;
     ctx.moveTo(startX, startY);
-    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.lineTo(coords.x, coords.y);
     ctx.stroke();
   } else if (currentTool === "rectangle") {
-    const rectWidth = e.offsetX - startX;
-    const rectHeight = e.offsetY - startY;
-    ctx.lineWidth = brushSize;
+    const rectWidth = coords.x - startX;
+    const rectHeight = coords.y - startY;
+    ctx.lineWidth = getBrushSize();
     ctx.strokeStyle = brushColor;
     ctx.strokeRect(startX, startY, rectWidth, rectHeight);
   } else if (currentTool === "circle") {
-    const radius = Math.sqrt(
-      Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
-    );
-    ctx.lineWidth = brushSize;
-    ctx.strokeStyle = brushColor;
+    const radius = Math.sqrt((coords.x - startX) ** 2 + (coords.y - startY) ** 2);
     ctx.beginPath();
+    ctx.lineWidth = getBrushSize();
+    ctx.strokeStyle = brushColor;
     ctx.arc(startX, startY, radius, 0, Math.PI * 2);
     ctx.stroke();
   } else if (currentTool === "text") {
-    const text = prompt("Enter the text:");
+    const text = prompt("Enter text:");
     if (text) {
+      const fontSize = document.getElementById("font-size").value;
+      ctx.font = `${fontSize}px Arial`;
       ctx.fillStyle = brushColor;
-      ctx.font = `${brushSize * 2}px Arial`;
       ctx.fillText(text, startX, startY);
     }
   }
-});
 
-// Utility functions
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  e.preventDefault(); // Prevent scrolling on touch devices
 }
 
-function saveImage() {
+// Attach Mouse and Touch Events
+canvas.addEventListener("mousedown", startDrawing);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDrawing);
+
+canvas.addEventListener("touchstart", startDrawing);
+canvas.addEventListener("touchmove", draw);
+canvas.addEventListener("touchend", stopDrawing);
+
+// Tool Options
+document.getElementById("pen-color").addEventListener("input", (e) => {
+  brushColor = e.target.value;
+});
+document.getElementById("pen-size").addEventListener("input", (e) => {
+  penSize = e.target.value;
+});
+document.getElementById("eraser-size").addEventListener("input", (e) => {
+  eraserSize = e.target.value;
+});
+
+// Save Work
+function saveWork() {
   const link = document.createElement("a");
   link.download = "whiteboard.png";
   link.href = canvas.toDataURL("image/png");
   link.click();
 }
 
-function uploadImage(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+// Upload Image
+function uploadImage() {
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+  fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = reader.result;
     };
-    img.src = reader.result;
+    reader.readAsDataURL(file);
   };
-  reader.readAsDataURL(file);
+  fileInput.click();
 }
+
+// Fullscreen toggle
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+}
+
+// Call resizeCanvas when fullscreen changes
+document.addEventListener('fullscreenchange', resizeCanvas);
+document.addEventListener('webkitfullscreenchange', resizeCanvas); // For Safari
+document.addEventListener('mozfullscreenchange', resizeCanvas); // For Firefox
+document.addEventListener('msfullscreenchange', resizeCanvas); // For IE/Edge
+
+// Initial Tool Setup
+setTool("pointer");
